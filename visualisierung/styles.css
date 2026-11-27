@@ -160,6 +160,8 @@ kbd { display: inline-grid; place-items: center; min-width: 25px; height: 25px; 
 .compare-box code.compare-removed { margin: 0 -4px; padding: 0 8px; border-left: 3px solid var(--red-bright); background: rgba(251, 113, 133, .18); color: #fecdd3; text-decoration: line-through; text-decoration-color: var(--red-bright); text-decoration-thickness: 1.5px; }
 .debug-remove .compare-after { border-color: var(--red-bright); }
 .debug-remove .compare-arrow { color: var(--red-bright); }
+.debug-keep .compare-after { border-color: var(--green-bright); }
+.debug-keep .compare-arrow { color: var(--green-bright); }
 .color-key { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 18px; color: var(--code-muted); font-size: 12px; }
 .color-key span { display: inline-flex; align-items: center; gap: 7px; }
 .color-key i { width: 9px; height: 9px; border-radius: 50%; }
@@ -575,8 +577,12 @@ footer a { color: var(--ink); }
   .debug-output.debug-compare { gap: 6px; }
 }
 @media (orientation: landscape) and (max-height: 560px) and (min-width: 600px) {
-  .compare-box pre { font-size: 11px; line-height: 1.35; }
-  .compare-label { font-size: 9px; }
+  .compare-box pre { font-size: 10.5px; line-height: 1.2; }
+  .compare-label { font-size: 9px; margin-bottom: 2px; }
+  .compare-box { padding: 5px 7px; }
+  .debug-panel { margin-top: 6px; padding: 6px 8px; }
+  .debug-head { display: none; }
+  .debug-output { margin-top: 0; }
 }
 @media (max-width: 480px) {
   .debug-output.debug-compare { padding-left: 8px; gap: 4px; }

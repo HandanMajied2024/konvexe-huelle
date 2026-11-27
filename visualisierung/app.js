@@ -183,7 +183,21 @@ const chapters = [
       "# Vorwärts entsteht der obere Rand.",
       "oben: list[Punkt] = _rechte_randkette(sortiert)",
     ],
-    debug: [["Eingabe", `sortiert = ${sortiertePunkte}`], ["oben", `oben = ${obereHuelle}`]],
+    debug: [],
+    debugCompare: [
+      {
+        label: "Eingabe",
+        lines: [
+          "sortiert = [", "    Punkt(-3, 0),", "    Punkt(-2, 2),", "    Punkt(-1, -1),", "    Punkt(0, 3),",
+          "    Punkt(1, 0),", "    Punkt(2, -2),", "    Punkt(3, 1),", "    Punkt(4, 0),", "]",
+        ],
+        removed: [3, 5, 6],
+      },
+      {
+        label: "Ergebnis",
+        lines: ["oben = [", "    Punkt(-3, 0),", "    Punkt(-2, 2),", "    Punkt(0, 3),", "    Punkt(3, 1),", "    Punkt(4, 0),", "]"],
+      },
+    ],
     debugTone: "keep",
   },
   {
