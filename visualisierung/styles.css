@@ -328,6 +328,7 @@ footer a { color: var(--ink); }
 .viz .turn-point-label { fill: var(--muted); font-size: 12px; font-weight: 700; }
 .viz .turn-result-bg { fill: currentColor; opacity: .13; }
 .viz .turn-result { fill: currentColor; font-size: 13px; font-weight: 800; text-anchor: middle; }
+.viz .turn-condition { fill: currentColor; font: 800 17px "SFMono-Regular", Menlo, monospace; text-anchor: middle; }
 .viz .sort-heading { fill: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; }
 .viz .sort-command { fill: var(--ink); font: 700 15px "SFMono-Regular", monospace; text-anchor: middle; }
 .viz .sort-card rect { fill: white; stroke: var(--line); stroke-width: 1.5; }

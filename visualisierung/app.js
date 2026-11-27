@@ -323,15 +323,15 @@ function drawOrientationChapter(svg) {
 
   const cards = [
     {
-      x: 20, title: "RECHTSKURVE", result: "q bleibt", tone: "right",
+      x: 20, title: "RECHTSKURVE", condition: "D(p, q, r) < 0", result: "q bleibt", tone: "right",
       points: [[30, 125], [100, 70], [170, 125]],
     },
     {
-      x: 255, title: "LINKSKURVE", result: "q raus", tone: "left",
+      x: 255, title: "LINKSKURVE", condition: "D(p, q, r) > 0", result: "q raus", tone: "left",
       points: [[30, 75], [100, 130], [170, 75]],
     },
     {
-      x: 490, title: "GERADE", result: "q raus", tone: "straight",
+      x: 490, title: "GERADE", condition: "D(p, q, r) = 0", result: "q raus", tone: "straight",
       points: [[30, 105], [100, 105], [170, 105]],
     },
   ];
@@ -355,6 +355,7 @@ function drawOrientationChapter(svg) {
     });
 
     group.append(
+      svgElement("text", { x: card.x + 105, y: 228, class: "turn-condition" }, card.condition),
       svgElement("rect", { x: card.x + 18, y: 246, width: 174, height: 30, rx: 15, class: "turn-result-bg" }),
       svgElement("text", { x: card.x + 105, y: 267, class: "turn-result" }, card.result),
     );
