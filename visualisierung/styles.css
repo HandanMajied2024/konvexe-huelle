@@ -237,12 +237,6 @@ kbd { display: inline-grid; place-items: center; min-width: 25px; height: 25px; 
 .replay-button { align-self: flex-start; margin-top: 18px; padding: 9px 13px; border: 1px solid var(--ink); border-radius: 5px; background: white; color: var(--ink); font: 600 13px "SFMono-Regular", monospace; cursor: pointer; }
 .replay-button:hover { background: var(--ink); color: white; }
 .formula { max-width: 700px; margin: 18px 0 0; padding: 14px 16px; background: var(--faint); font-size: clamp(13px, 1.2vw, 17px); overflow-x: auto; white-space: nowrap; }
-.worked-example { max-width: 700px; margin-top: 14px; padding: 18px; border: 1px solid var(--ink); background: white; }
-.worked-title { display: block; color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: .09em; }
-.worked-points { margin-top: 12px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.worked-points code { padding: 10px; border-left: 4px solid var(--blue); border-radius: 0; background: var(--blue-soft); font-size: 13px; overflow-wrap: anywhere; }
-.worked-calculation { display: block; margin-top: 12px; padding: 12px !important; border-radius: 0 !important; background: var(--faint) !important; font-size: 15px !important; }
-.worked-result { display: block; margin-top: 10px; padding: 11px 13px; border-left: 5px solid var(--green); background: var(--green-soft); color: #0b6b2d; }
 .result { max-width: 760px; margin-top: 24px; display: flex; justify-content: space-between; gap: 10px; padding: 16px 0; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); font-size: 14px; }
 
 .overview { max-width: 1180px; margin: 0 auto; padding: 120px 40px 150px; scroll-margin-top: 0; }
@@ -385,7 +379,6 @@ footer a { color: var(--ink); }
   .color-key { display: none; }
   .step { min-height: 100vh; padding: 10vh 24px; opacity: 1; }
   .step h2 { font-size: 38px; }
-  .worked-points { grid-template-columns: 1fr; }
   .result { flex-direction: column; }
   .overview { padding: 90px 24px 120px; }
   .flow-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
