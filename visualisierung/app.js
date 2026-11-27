@@ -662,14 +662,6 @@ steps.forEach((step, index) => {
   dots.append(dot);
 });
 
-document.querySelectorAll("[data-replay]").forEach((button) => {
-  button.addEventListener("click", () => {
-    const index = Number(button.dataset.replay);
-    drawings[index](steps[index].querySelector(".viz"));
-    renderCode(index);
-  });
-});
-
 flowButtons.forEach((button) => {
   button.addEventListener("click", () => renderFlowStage(Number(button.dataset.flowStage)));
 });
