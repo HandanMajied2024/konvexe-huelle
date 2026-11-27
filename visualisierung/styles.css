@@ -234,8 +234,6 @@ kbd { display: inline-grid; place-items: center; min-width: 25px; height: 25px; 
 .viz-card { max-width: 760px; margin-top: 38px; padding: 14px; border: 1px solid var(--line); background: #fff; }
 .viz { display: block; width: 100%; aspect-ratio: 16 / 9; }
 .plain-rule { max-width: 700px; margin: 22px 0 0; font-size: 15px; }
-.replay-button { align-self: flex-start; margin-top: 18px; padding: 9px 13px; border: 1px solid var(--ink); border-radius: 5px; background: white; color: var(--ink); font: 600 13px "SFMono-Regular", monospace; cursor: pointer; }
-.replay-button:hover { background: var(--ink); color: white; }
 .formula { max-width: 700px; margin: 18px 0 0; padding: 14px 16px; background: var(--faint); font-size: clamp(13px, 1.2vw, 17px); overflow-x: auto; white-space: nowrap; }
 .result { max-width: 760px; margin-top: 24px; display: flex; justify-content: space-between; gap: 10px; padding: 16px 0; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); font-size: 14px; }
 
