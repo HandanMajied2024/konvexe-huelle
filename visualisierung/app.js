@@ -160,9 +160,17 @@ const chapters = [
       "",
       "    del kette[-2]",
     ],
-    debug: [
-      ["vorher", "kette = [Punkt(-3, 0), Punkt(-2, 2), Punkt(-1, -1), Punkt(0, 3)]"],
-      ["del q", "kette = [Punkt(-3, 0), Punkt(-2, 2), Punkt(0, 3)]"],
+    debug: [],
+    debugCompare: [
+      {
+        label: "vorher",
+        lines: ["kette = [", "    Punkt(-3, 0),", "    Punkt(-2, 2),", "    Punkt(-1, -1),", "    Punkt(0, 3),", "]"],
+        removed: [3],
+      },
+      {
+        label: "nachher · del q",
+        lines: ["kette = [", "    Punkt(-3, 0),", "    Punkt(-2, 2),", "    Punkt(0, 3),", "]"],
+      },
     ],
     debugTone: "remove",
   },
@@ -664,6 +672,7 @@ function renderCode(index) {
         const code = document.createElement("code");
         code.textContent = line;
         if (box.mark?.includes(lineIndex)) code.className = "compare-new";
+        if (box.removed?.includes(lineIndex)) code.className = "compare-removed";
         pre.append(code);
       });
       card.append(label, pre);

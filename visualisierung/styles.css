@@ -181,6 +181,9 @@ kbd { display: inline-grid; place-items: center; min-width: 25px; height: 25px; 
 .compare-box code { display: block; padding: 0 4px; white-space: pre; }
 .compare-box code.compare-new { margin: 0 -4px; padding: 0 8px; border-left: 3px solid var(--blue-bright); background: rgba(96, 165, 250, .18); color: #fff; }
 .compare-arrow { align-self: center; color: var(--blue-bright); font-size: 22px; font-weight: 700; }
+.compare-box code.compare-removed { margin: 0 -4px; padding: 0 8px; border-left: 3px solid var(--red-bright); background: rgba(251, 113, 133, .18); color: #fecdd3; text-decoration: line-through; text-decoration-color: var(--red-bright); text-decoration-thickness: 1.5px; }
+.debug-remove .compare-after { border-color: var(--red-bright); }
+.debug-remove .compare-arrow { color: var(--red-bright); }
 .color-key { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 18px; color: var(--code-muted); font-size: 12px; }
 .color-key span { display: inline-flex; align-items: center; gap: 7px; }
 .color-key i { width: 9px; height: 9px; border-radius: 50%; }
@@ -611,6 +614,6 @@ footer a { color: var(--ink); }
   .compare-box { padding: 6px 5px; }
   .compare-box pre { font-size: 10.5px; }
   .compare-box code { padding: 0 2px; }
-  .compare-box code.compare-new { margin: 0 -2px; padding: 0 2px 0 1px; }
+  .compare-box code.compare-new, .compare-box code.compare-removed { margin: 0 -2px; padding: 0 2px 0 1px; }
   .compare-arrow { font-size: 13px; }
 }
