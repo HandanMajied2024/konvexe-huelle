@@ -753,3 +753,15 @@ setActive(0);
 renderFlowStage(0);
 highlightCompleteCode();
 syncLessonChrome();
+
+// Fester „Nach oben“-Button: erscheint erst nach etwas Scrollen.
+const backToTop = document.getElementById("back-to-top");
+if (backToTop) {
+  const toggleBackToTop = () => backToTop.classList.toggle("visible", window.scrollY > 600);
+  window.addEventListener("scroll", toggleBackToTop, { passive: true });
+  toggleBackToTop();
+  backToTop.addEventListener("click", () => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+  });
+}

@@ -190,6 +190,7 @@
       if (s && s.typ === "append" && p === s.punkt) cls += " is-new";
       if (s && s.typ === "done" && !hullSet.has(p) && punkte.length > 2) cls += " is-inside";
       svg.append(el("circle", { cx: sx(p.x), cy: sy(p.y), r: 6.5, class: cls }));
+      svg.append(el("circle", { cx: sx(p.x), cy: sy(p.y), r: trefferRadius(), class: "pg-hit" }));
       if (zeigeNamen && p.name) {
         svg.append(el("text", { x: sx(p.x) + 9, y: sy(p.y) - 9, class: "pg-label" }, p.name));
       }
@@ -274,11 +275,15 @@
     const { huelle, log } = konvexeHuelle(punkte);
     trace = log;
     stepIndex = zumEnde ? trace.length - 1 : 0;
+    zeigeErgebnis(huelle);
+    render();
+  }
+
+  function zeigeErgebnis(huelle) {
     countBox.textContent = `${punkte.length} / ${MAX_PUNKTE} Punkte`;
     resultBox.innerHTML =
       `<p class="pg-result-head">Konvexe Hülle: <b>${huelle.length} Punkte</b> (im Uhrzeigersinn)</p>` +
       `<ol>${huelle.map((p) => `<li><span>${p.name}</span><code>${pt(p)}</code></li>`).join("")}</ol>`;
-    render();
   }
 
   function render() {
@@ -331,19 +336,107 @@
     errorBox.hidden = false;
   }
 
-  // Klick in die Fläche: Punkt setzen oder vorhandenen Punkt entfernen.
-  svg.addEventListener("click", (event) => {
+  // Maus/Finger: kurzer Klick setzt oder entfernt einen Punkt,
+  // Ziehen verschiebt einen vorhandenen Punkt (Drag & Drop).
+  let drag = null;
+
+  function svgPunkt(event) {
     const m = svg.getScreenCTM();
-    if (!m) return;
-    const loc = new DOMPoint(event.clientX, event.clientY).matrixTransform(m.inverse());
-    const treffer = punkte.find((p) => Math.hypot(sx(p.x) - loc.x, sy(p.y) - loc.y) < 11);
+    return m ? new DOMPoint(event.clientX, event.clientY).matrixTransform(m.inverse()) : null;
+  }
+
+  function trefferRadius() {
+    // ca. 16 Bildschirmpixel, egal wie stark die Fläche skaliert ist
+    const breite = svg.getBoundingClientRect().width || W;
+    return Math.max(11, 16 * (W / breite));
+  }
+
+  function raster(loc) {
+    const r = (v, s) => Number((Math.round(v / s) * s).toFixed(6));
+    const x = Math.min(view.xmax, Math.max(view.xmin, ix(loc.x)));
+    const y = Math.min(view.ymax, Math.max(view.ymin, iy(loc.y)));
+    return {
+      x: r(x, niceStep(view.xmax - view.xmin) / 2),
+      y: r(y, niceStep(view.ymax - view.ymin) / 2),
+    };
+  }
+
+  function neuMitFesterAnsicht() {
+    // Ansicht nicht verschieben, damit Punkte nicht „springen“.
+    const alt = view;
+    neuBerechnen();
+    if (punkte.every((p) => p.x >= alt.xmin && p.x <= alt.xmax && p.y >= alt.ymin && p.y <= alt.ymax)) {
+      view = alt;
+      render();
+    }
+  }
+
+  svg.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0) return;
+    const loc = svgPunkt(event);
+    if (!loc) return;
+    const radius = trefferRadius();
+    let treffer = null;
+    let best = Infinity;
+    for (const p of punkte) {
+      const d = Math.hypot(sx(p.x) - loc.x, sy(p.y) - loc.y);
+      if (d < radius && d < best) { best = d; treffer = p; }
+    }
+    drag = { punkt: treffer, startX: event.clientX, startY: event.clientY, bewegt: false, view };
     if (treffer) {
-      punkte = punkte.filter((p) => p !== treffer);
+      event.preventDefault();
+      svg.setPointerCapture(event.pointerId);
+      stopPlay();
+    }
+  });
+
+  svg.addEventListener("pointermove", (event) => {
+    if (!drag || !drag.punkt) return;
+    if (!drag.bewegt && Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) < 4) return;
+    drag.bewegt = true;
+    svg.classList.add("is-dragging");
+    const loc = svgPunkt(event);
+    if (!loc) return;
+    view = drag.view;
+    const ziel = raster(loc);
+    // Laut Aufgabe sind alle x verschieden: Ist das Ziel-x belegt, bleibt x stehen.
+    const belegt = punkte.some((q) => q !== drag.punkt && q.x === ziel.x);
+    if (!belegt) drag.punkt.x = ziel.x;
+    drag.punkt.y = ziel.y;
+    errorBox.hidden = !belegt;
+    if (belegt) errorBox.textContent = `x = ${fmt(ziel.x)} ist schon belegt – der Punkt bleibt bei x = ${fmt(drag.punkt.x)}.`;
+    const { huelle, log } = konvexeHuelle(punkte);
+    trace = log;
+    stepIndex = trace.length - 1;
+    zeigeErgebnis(huelle);
+    render();
+  });
+
+  function beendeDrag(event, abgebrochen = false) {
+    if (!drag) return;
+    const d = drag;
+    drag = null;
+    svg.classList.remove("is-dragging");
+    if (d.punkt && svg.hasPointerCapture(event.pointerId)) svg.releasePointerCapture(event.pointerId);
+    if (abgebrochen) return;
+
+    if (d.punkt && d.bewegt) {
+      // Verschieben beendet
+      zuText();
+      neuMitFesterAnsicht();
+      return;
+    }
+    if (Math.hypot(event.clientX - d.startX, event.clientY - d.startY) >= 6) return;
+
+    if (d.punkt) {
+      // Kurzer Klick auf einen Punkt: entfernen
+      punkte = punkte.filter((p) => p !== d.punkt);
     } else {
+      // Kurzer Klick ins Leere: neuen Punkt setzen
       if (punkte.length >= MAX_PUNKTE) { zeigeFehler(`Es sind höchstens ${MAX_PUNKTE} Punkte erlaubt.`); return; }
-      const step = niceStep(view.xmax - view.xmin) / 2;
-      const r = (v, s) => Number((Math.round(v / s) * s).toFixed(6));
-      const p = { x: r(ix(loc.x), step), y: r(iy(loc.y), niceStep(view.ymax - view.ymin) / 2) };
+      const loc = svgPunkt(event);
+      if (!loc) return;
+      const p = raster(loc);
       if (punkte.some((q) => q.x === p.x)) {
         zeigeFehler(`x = ${fmt(p.x)} ist schon belegt – laut Aufgabe müssen alle x-Koordinaten verschieden sein.`);
         return;
@@ -351,14 +444,11 @@
       punkte = [...punkte, p];
     }
     zuText();
-    // Ansicht beim Klicken nicht verschieben, damit Punkte nicht „springen“.
-    const alt = view;
-    neuBerechnen();
-    if (punkte.every((p) => p.x >= alt.xmin && p.x <= alt.xmax && p.y >= alt.ymin && p.y <= alt.ymax)) {
-      view = alt;
-      render();
-    }
-  });
+    neuMitFesterAnsicht();
+  }
+
+  svg.addEventListener("pointerup", (event) => beendeDrag(event));
+  svg.addEventListener("pointercancel", (event) => beendeDrag(event, true));
 
   let debounce = null;
   textarea.addEventListener("input", () => {

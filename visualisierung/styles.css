@@ -461,11 +461,13 @@ footer a { color: var(--ink); }
 .pg-result li { display: flex; gap: 8px; font-size: 14px; }
 .pg-result li span { min-width: 2.6em; color: var(--green); font-weight: 700; }
 .pg-main { min-width: 0; }
-.pg-canvas { display: block; width: 100%; height: auto; border: 2px solid var(--ink); border-radius: 6px; background: white; cursor: crosshair; user-select: none; }
+.pg-canvas { display: block; width: 100%; height: auto; border: 2px solid var(--ink); border-radius: 6px; background: white; cursor: crosshair; user-select: none; touch-action: pan-y pinch-zoom; }
 .pg-canvas .pg-grid { stroke: #ececea; stroke-width: 1; }
 .pg-canvas .pg-axis { stroke: var(--strong-line); stroke-width: 1.5; }
 .pg-canvas .pg-tick { fill: var(--muted); font: 11px "SFMono-Regular", monospace; }
 .pg-canvas .pg-empty { fill: var(--muted); font-size: 18px; }
+.pg-canvas .pg-hit { fill: transparent; cursor: grab; touch-action: none; }
+.pg-canvas.is-dragging, .pg-canvas.is-dragging .pg-hit { cursor: grabbing; }
 .pg-canvas .pg-label { fill: var(--ink); font: 600 12px "SFMono-Regular", monospace; pointer-events: none; }
 .pg-canvas .pg-point { fill: white; stroke: var(--ink); stroke-width: 2.2; }
 .pg-canvas .pg-point.is-hull { fill: var(--green); stroke: var(--green); }
@@ -616,4 +618,27 @@ footer a { color: var(--ink); }
   .compare-box code { padding: 0 2px; }
   .compare-box code.compare-new, .compare-box code.compare-removed { margin: 0 -2px; padding: 0 2px 0 1px; }
   .compare-arrow { font-size: 13px; }
+}
+
+/* ---------- Nach-oben-Button ---------- */
+.back-to-top {
+  position: fixed; right: 24px; bottom: 84px; z-index: 35;
+  width: 48px; height: 48px; padding: 0;
+  display: grid; place-items: center;
+  border: 1px solid var(--ink); border-radius: 50%;
+  background: var(--ink); color: white; cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+  opacity: 0; pointer-events: none; transform: translateY(10px);
+  transition: opacity .25s ease, transform .25s var(--ease), background .2s ease;
+}
+.back-to-top.visible { opacity: 1; pointer-events: auto; transform: none; }
+.back-to-top:hover { background: white; color: var(--ink); }
+.back-to-top:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+.back-to-top svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+@media (max-width: 920px) {
+  .back-to-top { right: 16px; bottom: 76px; width: 44px; height: 44px; }
+}
+@media (orientation: landscape) and (max-height: 560px) and (min-width: 600px) {
+  .back-to-top { right: 10px; bottom: 56px; width: 38px; height: 38px; }
+  .back-to-top svg { width: 18px; height: 18px; }
 }
