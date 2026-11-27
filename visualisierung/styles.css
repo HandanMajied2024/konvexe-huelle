@@ -173,6 +173,14 @@ kbd { display: inline-grid; place-items: center; min-width: 25px; height: 25px; 
 }
 .debug-sort .debug-row { animation: debug-row-in .55s var(--ease) both; }
 @keyframes debug-row-in { from { opacity: 0; transform: translateX(-8px); } }
+.debug-output.debug-compare { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: stretch; gap: 10px; }
+.compare-box { min-width: 0; padding: 10px 12px; border: 1px solid #45454a; border-radius: 6px; background: #111113; }
+.compare-after { border-color: var(--blue-bright); }
+.compare-label { display: block; margin-bottom: 6px; color: #b8b8b4; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.compare-box pre { margin: 0; overflow-x: auto; font: 600 16px/1.5 "SFMono-Regular", Menlo, monospace; color: var(--code-text); }
+.compare-box code { display: block; padding: 0 4px; white-space: pre; }
+.compare-box code.compare-new { margin: 0 -4px; padding: 0 8px; border-left: 3px solid var(--blue-bright); background: rgba(96, 165, 250, .18); color: #fff; }
+.compare-arrow { align-self: center; color: var(--blue-bright); font-size: 22px; font-weight: 700; }
 .color-key { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 18px; color: var(--code-muted); font-size: 12px; }
 .color-key span { display: inline-flex; align-items: center; gap: 7px; }
 .color-key i { width: 9px; height: 9px; border-radius: 50%; }
@@ -584,4 +592,25 @@ footer a { color: var(--ink); }
   .viz-card { margin-top: 12px; padding: 6px; }
   .step-nav { left: auto; right: 10px; bottom: 8px; gap: 8px; padding: 5px; }
   .step-nav button { min-height: 32px; padding: 4px 10px; font-size: 14px; }
+}
+
+/* Vorher/Nachher-Kästen auf kleinen Bildschirmen kompakter */
+@media (max-width: 920px) {
+  .compare-box { padding: 7px 8px; }
+  .compare-label { font-size: 11px; margin-bottom: 3px; }
+  .compare-box pre { font-size: 13px; line-height: 1.4; }
+  .compare-arrow { font-size: 16px; }
+  .debug-output.debug-compare { gap: 6px; }
+}
+@media (orientation: landscape) and (max-height: 560px) and (min-width: 600px) {
+  .compare-box pre { font-size: 11px; line-height: 1.35; }
+  .compare-label { font-size: 9px; }
+}
+@media (max-width: 480px) {
+  .debug-output.debug-compare { padding-left: 8px; gap: 4px; }
+  .compare-box { padding: 6px 5px; }
+  .compare-box pre { font-size: 10.5px; }
+  .compare-box code { padding: 0 2px; }
+  .compare-box code.compare-new { margin: 0 -2px; padding: 0 2px 0 1px; }
+  .compare-arrow { font-size: 13px; }
 }

@@ -134,9 +134,17 @@ const chapters = [
       "    for punkt in punkte:",
       "        kette.append(punkt)",
     ],
-    debug: [
-      ["vorher", "kette = [Punkt(-3, 0), Punkt(-2, 2), Punkt(-1, -1)]"],
-      ["append", "kette = [Punkt(-3, 0), Punkt(-2, 2), Punkt(-1, -1), Punkt(0, 3)]"],
+    debug: [],
+    debugCompare: [
+      {
+        label: "vorher",
+        lines: ["kette = [", "    Punkt(-3, 0),", "    Punkt(-2, 2),", "    Punkt(-1, -1),", "]"],
+      },
+      {
+        label: "nachher · append",
+        lines: ["kette = [", "    Punkt(-3, 0),", "    Punkt(-2, 2),", "    Punkt(-1, -1),", "    Punkt(0, 3),", "]"],
+        mark: [4],
+      },
     ],
   },
   {
@@ -634,6 +642,34 @@ function renderCode(index) {
     row.append(name, state);
     debugOutput.append(row);
   });
+
+  // Vorher/Nachher als zwei Kästen nebeneinander, ein Listeneintrag pro Zeile.
+  if (chapter.debugCompare) {
+    debugOutput.classList.add("debug-compare");
+    chapter.debugCompare.forEach((box, boxIndex) => {
+      if (boxIndex > 0) {
+        const arrow = document.createElement("span");
+        arrow.className = "compare-arrow";
+        arrow.setAttribute("aria-hidden", "true");
+        arrow.textContent = "→";
+        debugOutput.append(arrow);
+      }
+      const card = document.createElement("div");
+      card.className = `compare-box${boxIndex > 0 ? " compare-after" : ""}`;
+      const label = document.createElement("span");
+      label.className = "compare-label";
+      label.textContent = box.label;
+      const pre = document.createElement("pre");
+      box.lines.forEach((line, lineIndex) => {
+        const code = document.createElement("code");
+        code.textContent = line;
+        if (box.mark?.includes(lineIndex)) code.className = "compare-new";
+        pre.append(code);
+      });
+      card.append(label, pre);
+      debugOutput.append(card);
+    });
+  }
 }
 
 function setActive(index, shouldScroll = false) {
