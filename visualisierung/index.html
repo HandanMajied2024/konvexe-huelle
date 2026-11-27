@@ -85,75 +85,76 @@
       <small>Jedes Rechteck hat genau eine Aufgabe.</small>
     </div>
 
-    <div class="code-roadmap" aria-label="Programmablauf von Eingabe über die Code-Struktur und main bis zur Ausgabe">
-      <div class="road-stage input-stage">
-        <div class="road-icon blue-icon" aria-hidden="true">
-          <svg viewBox="0 0 32 32"><path d="M8 3h11l6 6v20H8z"></path><path d="M19 3v7h6M12 16h9M12 21h9"></path></svg>
-        </div>
-        <span class="stage-kicker">Eingabe</span>
-        <strong>Punktdatei</strong>
-        <code>x y</code>
-      </div>
-
-      <span class="road-arrow" aria-hidden="true">→</span>
-
-      <div class="code-structure-card">
-        <div class="structure-row">
-          <div class="row-label">
-            <span class="mini-icon blue-icon" aria-hidden="true">●</span>
-            <span>Klasse</span>
-          </div>
-          <div class="code-node node-blue">
-            <code>Punkt</code>
-            <span>speichert x + y</span>
+    <div class="cs" aria-label="Programmablauf: Eingabe, main und Ausgabe sowie die von main aufgerufenen Funktionen">
+      <div class="cs-flow">
+        <div class="cs-stage">
+          <span class="cs-icon blue-icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32"><path d="M8 3h11l6 6v20H8z"></path><path d="M19 3v7h6M12 16h9M12 21h9"></path></svg>
+          </span>
+          <div>
+            <span class="cs-kicker">Eingabe</span>
+            <strong>Punktdatei</strong>
+            <small>eine Zeile <code>x y</code> pro Punkt</small>
           </div>
         </div>
-
-        <div class="structure-row functions-row">
-          <div class="row-label">
-            <span class="mini-icon yellow-icon" aria-hidden="true">ƒ</span>
-            <span>Funktionen</span>
-          </div>
-          <div class="function-grid">
-            <div class="code-node node-blue"><code>lies_punkte()</code><span>Datei einlesen</span></div>
-            <div class="code-node node-yellow"><code>validiere_punkte()</code><span>Eingabe prüfen</span></div>
-            <div class="code-node node-red"><code>orientierung()</code><span>Kurve erkennen</span></div>
-            <div class="code-node node-green"><code>_rechte_randkette()</code><span>halbe Hülle bauen</span></div>
+        <span class="cs-arrow" aria-hidden="true">→</span>
+        <div class="cs-stage cs-main">
+          <span class="cs-icon red-icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13"></circle><path class="play-shape" d="M13 10l9 6-9 6z"></path></svg>
+          </span>
+          <div>
+            <span class="cs-kicker">Start</span>
+            <strong><code>main()</code></strong>
+            <small>ruft alles der Reihe nach auf</small>
           </div>
         </div>
-
-        <div class="structure-row">
-          <div class="row-label">
-            <span class="mini-icon green-icon" aria-hidden="true">◇</span>
-            <span>Algorithmus</span>
-          </div>
-          <div class="code-node node-green algorithm-node">
-            <code>konvexe_huelle()</code>
-            <span>oben + unten verbinden</span>
+        <span class="cs-arrow" aria-hidden="true">→</span>
+        <div class="cs-stage cs-output">
+          <span class="cs-icon green-icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32"><path d="M4 19L10 7l13-2 6 10-5 11H10z"></path><circle cx="4" cy="19" r="2"></circle><circle cx="10" cy="7" r="2"></circle><circle cx="23" cy="5" r="2"></circle><circle cx="29" cy="15" r="2"></circle><circle cx="24" cy="26" r="2"></circle><circle cx="10" cy="26" r="2"></circle></svg>
+          </span>
+          <div>
+            <span class="cs-kicker">Ausgabe</span>
+            <strong>Hüllenpunkte</strong>
+            <small>im Uhrzeigersinn</small>
           </div>
         </div>
       </div>
 
-      <span class="road-arrow" aria-hidden="true">→</span>
+      <p class="cs-calls-title"><code>main()</code> ruft nacheinander auf:</p>
+      <ol class="cs-steps">
+        <li class="cs-step cs-blue">
+          <span class="cs-num">1</span>
+          <code class="cs-fn">lies_punkte()</code>
+          <span class="cs-desc">Datei einlesen → Liste von Punkten</span>
+          <ul class="cs-sub">
+            <li><code>validiere_punkte()</code><span>Eingabe prüfen</span></li>
+          </ul>
+        </li>
+        <li class="cs-step cs-green cs-key">
+          <span class="cs-num">2</span>
+          <code class="cs-fn">konvexe_huelle()</code>
+          <span class="cs-desc">der eigentliche Algorithmus</span>
+          <ul class="cs-sub">
+            <li><code>validiere_punkte()</code><span>Eingabe prüfen</span></li>
+            <li><code>sorted()</code><span>nach x sortieren</span></li>
+            <li><code>_rechte_randkette()</code><span>obere, dann untere Hälfte</span>
+              <ul class="cs-sub">
+                <li><code>orientierung()</code><span>Kurve erkennen</span></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li class="cs-step cs-yellow">
+          <span class="cs-num">3</span>
+          <code class="cs-fn">formatiere_punkt()</code>
+          <span class="cs-desc">jeden Hüllenpunkt als <code>(x, y)</code> ausgeben</span>
+        </li>
+      </ol>
 
-      <div class="road-stage main-stage">
-        <div class="road-icon red-icon" aria-hidden="true">
-          <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13"></circle><path class="play-shape" d="M13 10l9 6-9 6z"></path></svg>
-        </div>
-        <span class="stage-kicker">Start</span>
-        <strong><code>main()</code></strong>
-        <small>ruft alles auf</small>
-      </div>
-
-      <span class="road-arrow" aria-hidden="true">→</span>
-
-      <div class="road-stage output-stage">
-        <div class="road-icon green-icon" aria-hidden="true">
-          <svg viewBox="0 0 32 32"><path d="M4 19L10 7l13-2 6 10-5 11H10z"></path><circle cx="4" cy="19" r="2"></circle><circle cx="10" cy="7" r="2"></circle><circle cx="23" cy="5" r="2"></circle><circle cx="29" cy="15" r="2"></circle><circle cx="24" cy="26" r="2"></circle><circle cx="10" cy="26" r="2"></circle></svg>
-        </div>
-        <span class="stage-kicker">Ausgabe</span>
-        <strong>Hüllenpunkte</strong>
-        <small>im Uhrzeigersinn</small>
+      <div class="cs-type">
+        <span class="cs-dot blue-icon" aria-hidden="true">●</span>
+        <p><strong>Klasse <code>Punkt</code></strong> speichert x + y – alle Funktionen arbeiten mit diesem Datentyp.</p>
       </div>
     </div>
 
