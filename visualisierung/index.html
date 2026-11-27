@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Kleinschrittige Visualisierung des inkrementellen Algorithmus zur Berechnung der konvexen Hülle.">
+  <title>Konvexe Hülle – Code Schritt für Schritt</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="intro">
+    <p class="eyebrow">Bonusaufgabe · Fortgeschrittene Algorithmen</p>
+    <h1>Konvexe Hülle.<br>Code für Code erklärt.</h1>
+    <p class="lead">
+      Links siehst du immer genau den Code, der gerade ausgeführt wird.
+      Rechts siehst du, was dieser Code mit den Punkten macht.
+    </p>
+    <div class="intro-actions">
+      <a class="button primary" href="#ueberblick">Grobüberblick starten</a>
+      <a class="button" href="#ausprobieren">Eigene Punkte testen</a>
+      <span>Scrollen oder <kbd>←</kbd> <kbd>→</kbd> benutzen</span>
+    </div>
+    <div class="rubber-band" aria-label="Anschauliche Erklärung der konvexen Hülle">
+      <svg viewBox="0 0 700 240" role="img" aria-labelledby="rubber-title rubber-desc">
+        <title id="rubber-title">Gummiband um eine Punktmenge</title>
+        <desc id="rubber-desc">Ein geschlossenes Band umschließt die äußeren Punkte. Innere Punkte werden nicht berührt.</desc>
+        <path d="M66 145 L170 55 L375 36 L622 103 L558 199 L274 210 Z" class="band"/>
+        <g class="rubber-points">
+          <circle cx="66" cy="145" r="7"/><circle cx="170" cy="55" r="7"/>
+          <circle cx="375" cy="36" r="7"/><circle cx="622" cy="103" r="7"/>
+          <circle cx="558" cy="199" r="7"/><circle cx="274" cy="210" r="7"/>
+          <circle cx="240" cy="130" r="7" class="inside"/><circle cx="420" cy="135" r="7" class="inside"/>
+          <circle cx="335" cy="170" r="7" class="inside"/>
+        </g>
+        <text x="25" y="26">Wie ein Gummiband um alle Punkte.</text>
+        <text x="455" y="232" class="muted-svg">Nur die berührten Punkte gehören zur Hülle.</text>
+      </svg>
+    </div>
+  </header>
+
+  <section class="big-picture" id="ueberblick" aria-labelledby="big-picture-title">
+    <div class="map-heading">
+      <p class="eyebrow">Die Programm-Landkarte</p>
+      <h2 id="big-picture-title">Vom Punkt zur Hülle.</h2>
+    </div>
+
+    <div class="mission-card">
+      <div class="mission-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48">
+          <circle cx="24" cy="24" r="17"></circle>
+          <circle cx="24" cy="24" r="9"></circle>
+          <circle cx="24" cy="24" r="3"></circle>
+        </svg>
+      </div>
+      <div>
+        <span>Unser Ziel</span>
+        <strong>Aus allen Punkten nur die äußeren finden.</strong>
+      </div>
+      <svg class="mission-sketch" viewBox="0 0 240 92" role="img" aria-label="Äußere Punkte bilden eine grüne Hülle um innere Punkte">
+        <path d="M20 57 L61 16 L142 10 L219 38 L181 78 L72 82 Z"></path>
+        <g>
+          <circle cx="20" cy="57" r="4"></circle><circle cx="61" cy="16" r="4"></circle>
+          <circle cx="142" cy="10" r="4"></circle><circle cx="219" cy="38" r="4"></circle>
+          <circle cx="181" cy="78" r="4"></circle><circle cx="72" cy="82" r="4"></circle>
+          <circle class="inside-dot" cx="93" cy="47" r="4"></circle>
+          <circle class="inside-dot" cx="151" cy="48" r="4"></circle>
+        </g>
+      </svg>
+    </div>
+
+    <div class="mission-example" aria-label="Konkretes Beispiel von der Eingabeliste zur Hüllenliste">
+      <div class="example-list example-input">
+        <span>Beispiel · Eingabe</span>
+        <code>punkte = [Punkt(0, 3), Punkt(-3, 0), Punkt(4, 0), Punkt(-1, -1), Punkt(2, -2), Punkt(-2, 2), Punkt(3, 1), Punkt(1, 0)]</code>
+      </div>
+      <span class="example-arrow" aria-hidden="true">→</span>
+      <div class="example-list example-output">
+        <span>Beispiel · Ergebnis</span>
+        <code>huelle = [Punkt(-3, 0), Punkt(-2, 2), Punkt(0, 3), Punkt(3, 1), Punkt(4, 0), Punkt(2, -2), Punkt(-1, -1)]</code>
+      </div>
+    </div>
+
+    <div class="structure-heading">
+      <span>Unsere Code-Struktur</span>
+      <small>Jedes Rechteck hat genau eine Aufgabe.</small>
+    </div>
+
+    <div class="code-roadmap" aria-label="Programmablauf von Eingabe über die Code-Struktur und main bis zur Ausgabe">
+      <div class="road-stage input-stage">
+        <div class="road-icon blue-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><path d="M8 3h11l6 6v20H8z"></path><path d="M19 3v7h6M12 16h9M12 21h9"></path></svg>
+        </div>
+        <span class="stage-kicker">Eingabe</span>
+        <strong>Punktdatei</strong>
+        <code>x y</code>
+      </div>
+
+      <span class="road-arrow" aria-hidden="true">→</span>
+
+      <div class="code-structure-card">
+        <div class="structure-row">
+          <div class="row-label">
+            <span class="mini-icon blue-icon" aria-hidden="true">●</span>
+            <span>Klasse</span>
+          </div>
+          <div class="code-node node-blue">
+            <code>Punkt</code>
+            <span>speichert x + y</span>
+          </div>
+        </div>
+
+        <div class="structure-row functions-row">
+          <div class="row-label">
+            <span class="mini-icon yellow-icon" aria-hidden="true">ƒ</span>
+            <span>Funktionen</span>
+          </div>
+          <div class="function-grid">
+            <div class="code-node node-blue"><code>lies_punkte()</code><span>Datei einlesen</span></div>
+            <div class="code-node node-yellow"><code>validiere_punkte()</code><span>Eingabe prüfen</span></div>
+            <div class="code-node node-red"><code>orientierung()</code><span>Kurve erkennen</span></div>
+            <div class="code-node node-green"><code>_rechte_randkette()</code><span>halbe Hülle bauen</span></div>
+          </div>
+        </div>
+
+        <div class="structure-row">
+          <div class="row-label">
+            <span class="mini-icon green-icon" aria-hidden="true">◇</span>
+            <span>Algorithmus</span>
+          </div>
+          <div class="code-node node-green algorithm-node">
+            <code>konvexe_huelle()</code>
+            <span>oben + unten verbinden</span>
+          </div>
+        </div>
+      </div>
+
+      <span class="road-arrow" aria-hidden="true">→</span>
+
+      <div class="road-stage main-stage">
+        <div class="road-icon red-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13"></circle><path class="play-shape" d="M13 10l9 6-9 6z"></path></svg>
+        </div>
+        <span class="stage-kicker">Start</span>
+        <strong><code>main()</code></strong>
+        <small>ruft alles auf</small>
+      </div>
+
+      <span class="road-arrow" aria-hidden="true">→</span>
+
+      <div class="road-stage output-stage">
+        <div class="road-icon green-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><path d="M4 19L10 7l13-2 6 10-5 11H10z"></path><circle cx="4" cy="19" r="2"></circle><circle cx="10" cy="7" r="2"></circle><circle cx="23" cy="5" r="2"></circle><circle cx="29" cy="15" r="2"></circle><circle cx="24" cy="26" r="2"></circle><circle cx="10" cy="26" r="2"></circle></svg>
+        </div>
+        <span class="stage-kicker">Ausgabe</span>
+        <strong>Hüllenpunkte</strong>
+        <small>im Uhrzeigersinn</small>
+      </div>
+    </div>
+
+    <div class="deep-dive-start">
+      <p><strong>Als Nächstes:</strong> Erst der Datenfluss, danach der Code.</p>
+      <a class="button primary" href="#datenfluss">Datenfluss ansehen</a>
+    </div>
+  </section>
+
+  <section class="overview" id="datenfluss" aria-labelledby="overview-title">
+    <p class="eyebrow">Noch vor dem Code</p>
+    <h2 id="overview-title">So fließen die Daten durch das Programm.</h2>
+
+    <div class="flow-debugger">
+      <div class="flow-tabs" role="tablist" aria-label="Schritte des Datenflusses">
+        <button class="active" type="button" role="tab" aria-selected="true" data-flow-stage="0">Einlesen</button>
+        <button type="button" role="tab" aria-selected="false" data-flow-stage="1">Prüfen</button>
+        <button type="button" role="tab" aria-selected="false" data-flow-stage="2">Sortieren</button>
+        <button type="button" role="tab" aria-selected="false" data-flow-stage="3">Oben</button>
+        <button type="button" role="tab" aria-selected="false" data-flow-stage="4">Unten</button>
+        <button type="button" role="tab" aria-selected="false" data-flow-stage="5">Verbinden</button>
+        <button type="button" role="tab" aria-selected="false" data-flow-stage="6">Ausgeben</button>
+      </div>
+
+      <div class="flow-function">
+        <span id="flow-step-number">Schritt 1 von 7</span>
+        <strong id="flow-function-name"><code>lies_punkte()</code></strong>
+        <p id="flow-explanation">Jede Textzeile wird zu einem Punkt-Objekt.</p>
+      </div>
+
+      <div class="flow-lists" aria-live="polite">
+        <section class="flow-list flow-before">
+          <span id="flow-before-label">Vorher · Textdatei</span>
+          <code id="flow-before-list">datei = ["0 3", "-3 0", "4 0", "-1 -1", "2 -2", "-2 2", "3 1", "1 0"]</code>
+        </section>
+        <span class="flow-arrow" aria-hidden="true">→</span>
+        <section class="flow-list flow-after">
+          <span id="flow-after-label">Nachher · lies_punkte()</span>
+          <code id="flow-after-list">punkte = [Punkt(0, 3), Punkt(-3, 0), Punkt(4, 0), Punkt(-1, -1), Punkt(2, -2), Punkt(-2, 2), Punkt(3, 1), Punkt(1, 0)]</code>
+        </section>
+      </div>
+    </div>
+
+    <div class="flow-start">
+      <span>Klicke die Schritte an: Die beiden Listen zeigen den Zustand wie im Debugger.</span>
+      <a class="button primary" href="#code-beispiel">Code Schritt für Schritt</a>
+    </div>
+  </section>
+
+  <section class="lesson-example" id="code-beispiel" aria-labelledby="example-title">
+    <div class="example-intro">
+      <p class="eyebrow">UNSER BEISPIEL FÜR ALLE CODESCHRITTE</p>
+      <h2 id="example-title">Ab jetzt verfolgen wir immer dieselben acht Punkte.</h2>
+      <p>So siehst du bei jeder Codezeile, was mit einer echten Liste passiert.</p>
+    </div>
+
+    <div class="example-thread">
+      <div class="thread-card thread-input">
+        <span>START · NOCH UNSORTIERT</span>
+        <code>punkte = [D, A, H, C, F, B, G, E]</code>
+      </div>
+
+      <div class="point-map" aria-label="Namen und Koordinaten der Beispielpunkte">
+        <span><b>A</b><code>(-3, 0)</code></span>
+        <span><b>B</b><code>(-2, 2)</code></span>
+        <span><b>C</b><code>(-1, -1)</code></span>
+        <span><b>D</b><code>(0, 3)</code></span>
+        <span><b>E</b><code>(1, 0)</code></span>
+        <span><b>F</b><code>(2, -2)</code></span>
+        <span><b>G</b><code>(3, 1)</code></span>
+        <span><b>H</b><code>(4, 0)</code></span>
+      </div>
+
+      <div class="thread-card thread-goal">
+        <span>ZIEL · NUR DIE ÄUSSEREN PUNKTE</span>
+        <code>huelle = [A, B, D, G, H, F, C]</code>
+      </div>
+    </div>
+
+    <div class="example-start">
+      <span><strong>E</strong> liegt innen und verschwindet. Alle anderen Punkte bilden die Hülle.</span>
+      <a class="button primary" href="#schritt-1">Beispiel im Code starten</a>
+    </div>
+  </section>
+
+  <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+
+  <main class="lesson" id="lektion">
+    <aside class="code-side" aria-label="Aktueller Python-Code">
+      <div class="sticky-code">
+        <div class="panel-head">
+          <div>
+            <span class="panel-kicker">PYTHON</span>
+            <h2 id="code-title">Der Punkt</h2>
+          </div>
+          <span id="step-count" class="step-count">1 / 8</span>
+        </div>
+        <pre class="code-window" aria-live="polite"><code id="code-block"></code></pre>
+        <p id="code-note" class="code-note"></p>
+        <div class="debug-panel" aria-live="polite">
+          <div class="debug-head">
+            <span>DEBUG-BLICK</span>
+            <small>Was passiert gerade?</small>
+          </div>
+          <div id="debug-output" class="debug-output"></div>
+        </div>
+        <div class="color-key" aria-label="Bedeutung der Farben">
+          <span><i class="key-x"></i>x-Richtung</span>
+          <span><i class="key-y"></i>y-Richtung</span>
+          <span><i class="key-keep"></i>behalten</span>
+          <span><i class="key-remove"></i>entfernen</span>
+        </div>
+      </div>
+    </aside>
+
+    <section class="steps" aria-label="Erklärschritte">
+      <article class="step" id="schritt-1" data-step="0">
+        <p class="step-label">Schritt 1</p>
+        <h2>Ein Punkt speichert nur x und y.</h2>
+        <p>
+          Jeder Punkt wird als kleines Objekt gespeichert. Damit kann der restliche
+          Code statt mit unklaren Zahlenpaaren mit <code>Punkt</code>-Objekten arbeiten.
+        </p>
+        <div class="viz-card"><svg class="viz" role="img" aria-label="Punkt mit x- und y-Koordinate"></svg></div>
+        <p class="plain-rule"><strong>Merksatz:</strong> Ein Punkt ist nur eine Adresse in der Ebene.</p>
+      </article>
+
+      <article class="step" id="schritt-2" data-step="1">
+        <p class="step-label">Schritt 2</p>
+        <h2>Drei Punkte verraten die Kurvenrichtung.</h2>
+        <p>
+          Die Funktion <code>orientierung</code> entscheidet über den mittleren Punkt q:
+          <strong class="keep-word">Grün</strong> heißt behalten,
+          <strong class="remove-word">Rot</strong> heißt entfernen und
+          <strong class="warn-word">Gelb</strong> bedeutet gerade Linie.
+        </p>
+        <div class="viz-card"><svg class="viz" role="img" aria-label="Rechtskurve und Determinante"></svg></div>
+        <p class="formula">D(p, q, r) = (qₓ−pₓ)(rᵧ−pᵧ) − (qᵧ−pᵧ)(rₓ−pₓ)</p>
+        <div class="worked-example" aria-label="Ausgerechnetes Beispiel für eine Rechtskurve">
+          <span class="worked-title">BEISPIEL AUS UNSERER LISTE</span>
+          <div class="worked-points">
+            <code><b>p = A</b> = Punkt(-3, 0)</code>
+            <code><b>q = B</b> = Punkt(-2, 2)</code>
+            <code><b>r = C</b> = Punkt(-1, -1)</code>
+          </div>
+          <code class="worked-calculation">D = (1 · -1) - (2 · 2) = -5</code>
+          <strong class="worked-result">-5 &lt; 0 · Rechtskurve · q bleibt</strong>
+        </div>
+      </article>
+
+      <article class="step" id="schritt-3" data-step="2">
+        <p class="step-label">Schritt 3</p>
+        <h2>Zuerst werden alle Punkte sortiert.</h2>
+        <p>
+          Der Algorithmus muss wissen, was „von links nach rechts“ bedeutet.
+          Deshalb ordnet <code>sorted</code> die Punktliste nach der x-Koordinate neu.
+          Die Animation zeigt, wie jeder Punkt an seinen neuen Platz wandert.
+        </p>
+        <div class="viz-card"><svg class="viz" role="img" aria-label="Nach x sortierte Punkte"></svg></div>
+        <p class="plain-rule"><strong>Warum?</strong> Danach kommt jeder neue Punkt garantiert weiter rechts als der vorherige.</p>
+        <button class="replay-button" type="button" data-replay="2">Animation wiederholen</button>
+      </article>
+
+      <article class="step" id="schritt-4" data-step="3">
+        <p class="step-label">Schritt 4</p>
+        <h2>Der nächste Punkt kommt probeweise dazu.</h2>
+        <p>
+          <code>append</code> hängt den nächsten Punkt hinten an die bisherige
+          Randkette. Noch ist nicht sicher, ob alle Punkte der Kette bleiben dürfen.
+        </p>
+        <div class="viz-card"><svg class="viz" role="img" aria-label="Neuer Punkt wird an die Randkette angehängt"></svg></div>
+        <p class="plain-rule"><strong>Wichtig:</strong> Erst einfügen, dann die letzten drei Punkte prüfen.</p>
+      </article>
+
+      <article class="step" id="schritt-5" data-step="4">
+        <p class="step-label">Schritt 5</p>
+        <h2>Eine falsche Kurve entfernt den mittleren Punkt.</h2>
+        <p>
+          Die letzten drei Punkte bilden hier keine Rechtskurve. Der mittlere Punkt
+          liegt deshalb innerhalb der neuen Randkante und kann kein Eckpunkt der
+          oberen Hülle sein. <code>del kette[-2]</code> entfernt genau ihn.
+        </p>
+        <div class="viz-card"><svg class="viz" role="img" aria-label="Mittlerer Punkt wird aus der Randkette entfernt"></svg></div>
+        <p class="plain-rule"><strong>Warum while?</strong> Nach dem Entfernen müssen die neuen letzten drei Punkte erneut geprüft werden.</p>
+      </article>
+
+      <article class="step" id="schritt-6" data-step="5">
+        <p class="step-label">Schritt 6</p>
+        <h2>Vorwärts entsteht die obere Hülle.</h2>
+        <p>
+          Die sortierten Punkte werden von links nach rechts verarbeitet. Am Ende
+          enthält die Liste nur noch die Punkte am oberen Rand.
+        </p>
+        <div class="viz-card"><svg class="viz" role="img" aria-label="Fertige obere Hülle"></svg></div>
+        <p class="plain-rule"><strong>Ergebnis oben:</strong> Alle verbleibenden Teilstücke machen Rechtskurven.</p>
+      </article>
+
+      <article class="step" id="schritt-7" data-step="6">
+        <p class="step-label">Schritt 7</p>
+        <h2>Rückwärts entsteht die untere Hülle.</h2>
+        <p>
+          Für die untere Hälfte wird dieselbe Funktion wiederverwendet. Der einzige
+          Unterschied: <code>reversed(sortiert)</code> liefert die Punkte von rechts nach links.
+        </p>
+        <div class="viz-card"><svg class="viz" role="img" aria-label="Fertige untere Hülle"></svg></div>
+        <p class="plain-rule"><strong>Schöne Eigenschaft:</strong> Kein zweiter Algorithmus ist nötig.</p>
+      </article>
+
+      <article class="step" id="schritt-8" data-step="7">
+        <p class="step-label">Schritt 8</p>
+        <h2>Beide Hälften ergeben die komplette Hülle.</h2>
+        <p>
+          Linkester und rechtester Punkt stehen in beiden Listen. Der Ausschnitt
+          <code>[1:-1]</code> entfernt diese Doppelungen aus der unteren Liste.
+          Danach werden beide Listen verbunden.
+        </p>
+        <div class="viz-card"><svg class="viz" role="img" aria-label="Komplette konvexe Hülle"></svg></div>
+        <div class="result">
+          <span>Eingabe: 8 Punkte</span>
+          <strong>Hülle: 7 Punkte</strong>
+          <span>Laufzeit: O(n log n)</span>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <nav class="step-nav" aria-label="Schrittnavigation">
+    <button id="prev" type="button" aria-label="Vorheriger Schritt">Zurück</button>
+    <div class="dots" id="dots" aria-label="Direkt zu einem Schritt springen"></div>
+    <button id="next" type="button" aria-label="Nächster Schritt">Weiter</button>
+  </nav>
+
+  <section class="playground" id="ausprobieren" aria-labelledby="playground-title">
+    <header class="playground-head">
+      <p class="eyebrow">SELBST AUSPROBIEREN · EIGENE PUNKTE</p>
+      <h2 id="playground-title">Gib deine eigenen Punkte ein.</h2>
+      <p>
+        Tippe Punkte im selben Format wie die Eingabedatei ein (<code>x y</code> pro Zeile)
+        oder klicke in die Fläche, um Punkte zu setzen. Ein Klick auf einen vorhandenen Punkt entfernt ihn.
+        Gerechnet wird mit demselben Algorithmus wie in <code>konvexe_huelle.py</code>.
+      </p>
+    </header>
+
+    <div class="pg-layout">
+      <div class="pg-side">
+        <label for="pg-input" class="pg-label-title">Eingabe · <span id="pg-count">0 Punkte</span></label>
+        <textarea id="pg-input" spellcheck="false" rows="12" aria-describedby="pg-hint pg-error"></textarea>
+        <p id="pg-hint" class="pg-hint">Kommentare mit <code>#</code>, Trennzeichen Leerzeichen, Komma oder Semikolon. Max. 100 Punkte, alle x verschieden.</p>
+        <p id="pg-error" class="pg-error" role="alert" hidden></p>
+        <div class="pg-buttons">
+          <button type="button" id="pg-example">Beispiel laden</button>
+          <span class="pg-random-group">
+            <button type="button" id="pg-random">Zufällig</button>
+            <input type="number" id="pg-random-n" value="20" min="1" max="100" aria-label="Anzahl zufälliger Punkte">
+          </span>
+          <button type="button" id="pg-clear">Leeren</button>
+        </div>
+        <div id="pg-result" class="pg-result" aria-live="polite"></div>
+      </div>
+
+      <div class="pg-main">
+        <svg id="pg-canvas" class="pg-canvas" viewBox="0 0 720 480" role="img" aria-label="Koordinatensystem mit den eingegebenen Punkten und ihrer konvexen Hülle"></svg>
+        <div class="pg-legend" aria-hidden="true">
+          <span><i class="lg-upper"></i>obere Hülle im Aufbau</span>
+          <span><i class="lg-lower"></i>untere Hülle im Aufbau</span>
+          <span><i class="lg-keep"></i>Rechtskurve · bleibt</span>
+          <span><i class="lg-remove"></i>keine Rechtskurve · entfernen</span>
+          <span><i class="lg-hull"></i>fertige Hülle</span>
+        </div>
+        <div class="pg-steps">
+          <div class="pg-controls">
+            <button type="button" id="pg-first" aria-label="Zum ersten Schritt">⏮</button>
+            <button type="button" id="pg-prev" aria-label="Schritt zurück">◀</button>
+            <button type="button" id="pg-play">▶ Abspielen</button>
+            <button type="button" id="pg-next" aria-label="Schritt weiter">▶</button>
+            <button type="button" id="pg-last" aria-label="Zum Ergebnis">⏭</button>
+            <span id="pg-step-count" class="pg-step-count"></span>
+          </div>
+          <input type="range" id="pg-slider" min="0" max="0" value="0" aria-label="Algorithmus-Schritt wählen">
+          <p id="pg-step-text" class="pg-step-text"></p>
+          <pre id="pg-step-state" class="pg-step-state"></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="complete-code" id="vollstaendiger-code" aria-labelledby="complete-code-title">
+    <header class="complete-code-head">
+      <p class="eyebrow">ZUM ABSCHLUSS · ALLES AN EINEM ORT</p>
+      <h2 id="complete-code-title">Der ganze Code – vollständig kommentiert</h2>
+      <p>
+        Diese Fassung steht bewusst allein. Jede Funktion besitzt Type-Annotations und
+        einen Docstring. Die Kommentare erklären zusätzlich, warum der jeweilige Schritt nötig ist.
+      </p>
+    </header>
+
+    <div class="complete-code-legend" aria-label="Lesehilfe für den vollständigen Code">
+      <span><strong>Type-Annotation</strong> = erwarteter Datentyp</span>
+      <span><strong>Docstring</strong> = Aufgabe der Funktion</span>
+      <span><strong># Kommentar</strong> = Erklärung eines Schrittes</span>
+    </div>
+
+    <pre class="complete-code-window"><code id="complete-code-block">"""Berechnet die konvexe Hülle einer Punktmenge.
+
+Die konvexe Hülle ist der kleinste Rand, der alle Punkte einschließt.
+Anschaulich kann man sie sich wie ein Gummiband um die äußeren Punkte vorstellen.
+"""
+
+import argparse
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Iterable
+
+
+# Laut Aufgabenstellung dürfen höchstens 100 Punkte verarbeitet werden.
+MAX_PUNKTE: int = 100
+
+
+@dataclass(frozen=True)
+class Punkt:
+    """Speichert genau eine x- und eine y-Koordinate.
+
+    Attributes:
+        x: Waagerechte Position des Punktes.
+        y: Senkrechte Position des Punktes.
+
+    ``frozen=True`` verhindert, dass Koordinaten später versehentlich
+    verändert werden.
+    """
+
+    x: float
+    y: float
+
+
+def orientierung(p: Punkt, q: Punkt, r: Punkt) -&gt; float:
+    """Bestimmt die Kurvenrichtung der drei Punkte p, q und r.
+
+    Args:
+        p: Erster Punkt der betrachteten Strecke.
+        q: Mittlerer Punkt, der eventuell entfernt werden muss.
+        r: Neu hinzugekommener dritter Punkt.
+
+    Returns:
+        Einen negativen Wert bei einer Rechtskurve, einen positiven Wert
+        bei einer Linkskurve und 0, wenn alle drei Punkte auf einer Geraden
+        liegen.
+    """
+
+    # Beide Produkte bilden zusammen die 2D-Determinante.
+    # Ihr Vorzeichen verrät, auf welcher Seite q liegt.
+    a: float = (q.x - p.x) * (r.y - p.y)
+    b: float = (q.y - p.y) * (r.x - p.x)
+    return a - b
+
+
+def validiere_punkte(punkte: list[Punkt]) -&gt; None:
+    """Prüft, ob die Punktliste alle Vorgaben der Aufgabe erfüllt.
+
+    Args:
+        punkte: Die zu prüfende Liste von Punkten.
+
+    Raises:
+        ValueError: Bei mehr als 100 Punkten oder doppelten x-Koordinaten.
+    """
+
+    if len(punkte) &gt; MAX_PUNKTE:
+        raise ValueError(f"Es sind höchstens {MAX_PUNKTE} Punkte erlaubt.")
+
+    # Ein Set enthält jeden x-Wert nur einmal. Ist es kürzer als die
+    # Punktliste, muss mindestens eine x-Koordinate doppelt vorkommen.
+    x_werte: set[float] = {punkt.x for punkt in punkte}
+    if len(x_werte) != len(punkte):
+        raise ValueError("Alle Punkte müssen unterschiedliche x-Koordinaten haben.")
+
+
+def _rechte_randkette(punkte: Iterable[Punkt]) -&gt; list[Punkt]:
+    """Baut aus den Punkten eine Randkette, die nur Rechtskurven enthält.
+
+    Args:
+        punkte: Punkte in der Reihenfolge, in der sie verarbeitet werden.
+
+    Returns:
+        Die fertige Randkette ohne innen liegende Punkte.
+    """
+
+    kette: list[Punkt] = []
+
+    for punkt in punkte:
+        # Der nächste Punkt wird zunächst probeweise angehängt.
+        kette.append(punkt)
+
+        # Erst ab drei Punkten kann eine Kurvenrichtung geprüft werden.
+        while len(kette) &gt;= 3:
+            p, q, r = kette[-3:]
+
+            # Eine negative Orientierung ist die gewünschte Rechtskurve.
+            # Dann darf q in der Kette bleiben.
+            if orientierung(p, q, r) &lt; 0:
+                break
+
+            # Bei einer Links- oder Geradeauskurve liegt q nicht am
+            # benötigten Rand. Der vorletzte Punkt wird daher entfernt.
+            del kette[-2]
+
+    return kette
+
+
+def konvexe_huelle(punkte: list[Punkt]) -&gt; list[Punkt]:
+    """Berechnet die konvexe Hülle im Uhrzeigersinn.
+
+    Args:
+        punkte: Unsortierte Eingabepunkte.
+
+    Returns:
+        Die Eckpunkte der konvexen Hülle im Uhrzeigersinn.
+    """
+
+    validiere_punkte(punkte)
+
+    # Der Algorithmus muss die Punkte von links nach rechts durchlaufen.
+    sortiert: list[Punkt] = sorted(punkte, key=lambda punkt: punkt.x)
+
+    # Null, ein oder zwei Punkte bilden bereits selbst ihre Hülle.
+    if len(sortiert) &lt;= 2:
+        return sortiert
+
+    # Vorwärts entsteht der obere Rand.
+    oben: list[Punkt] = _rechte_randkette(sortiert)
+
+    # Rückwärts erzeugt dieselbe Funktion den unteren Rand.
+    unten: list[Punkt] = _rechte_randkette(reversed(sortiert))
+
+    # Linkester und rechtester Punkt stehen in beiden Listen.
+    # [1:-1] entfernt diese beiden Doppelungen aus der unteren Liste.
+    return oben + unten[1:-1]
+
+
+def lies_punkte(datei: Path) -&gt; list[Punkt]:
+    """Liest Punkte aus einer Textdatei mit einer Zeile ``x y`` pro Punkt.
+
+    Args:
+        datei: Pfad zur Eingabedatei.
+
+    Returns:
+        Die eingelesenen und geprüften Punkte.
+
+    Raises:
+        OSError: Wenn die Datei nicht gelesen werden kann.
+        ValueError: Wenn eine Zeile keine zwei Zahlen enthält.
+    """
+
+    punkte: list[Punkt] = []
+    zeilen: list[str] = datei.read_text(encoding="utf-8").splitlines()
+
+    for zeilennummer, rohe_zeile in enumerate(zeilen, start=1):
+        # Alles hinter # ist ein Kommentar. Leere Zeilen werden ignoriert.
+        zeile: str = rohe_zeile.split("#", maxsplit=1)[0].strip()
+        if not zeile:
+            continue
+
+        try:
+            # Leerzeichen, Komma und Semikolon sind als Trenner erlaubt.
+            teile: list[str] = zeile.replace(",", " ").replace(";", " ").split()
+            x_text, y_text = teile
+            punkt = Punkt(float(x_text), float(y_text))
+            punkte.append(punkt)
+        except ValueError as fehler:
+            raise ValueError(
+                f"Ungültige Zeile {zeilennummer}: Erwartet werden zwei Zahlen."
+            ) from fehler
+
+    validiere_punkte(punkte)
+    return punkte
+
+
+def _formatiere_zahl(wert: float) -&gt; str:
+    """Gibt ganze Zahlen ohne unnötige Nachkommastelle aus."""
+
+    return str(int(wert)) if wert.is_integer() else f"{wert:g}"
+
+
+def formatiere_punkt(punkt: Punkt) -&gt; str:
+    """Formatiert einen Punkt lesbar als ``(x, y)``."""
+
+    x_text: str = _formatiere_zahl(punkt.x)
+    y_text: str = _formatiere_zahl(punkt.y)
+    return f"({x_text}, {y_text})"
+
+
+def main() -&gt; None:
+    """Steuert das komplette Programm: lesen, berechnen und ausgeben."""
+
+    parser = argparse.ArgumentParser(
+        description="Berechnet die konvexe Hülle einer Punktmenge."
+    )
+    parser.add_argument(
+        "datei",
+        type=Path,
+        help="Textdatei mit 'x y' pro Zeile",
+    )
+    args: argparse.Namespace = parser.parse_args()
+
+    try:
+        punkte: list[Punkt] = lies_punkte(args.datei)
+        huelle: list[Punkt] = konvexe_huelle(punkte)
+    except (OSError, ValueError) as fehler:
+        # parser.error zeigt die Meldung an und beendet das Programm sauber.
+        parser.error(str(fehler))
+
+    print(f"Eingabe: {len(punkte)} Punkte")
+    print(f"Konvexe Hülle: {len(huelle)} Punkte (im Uhrzeigersinn)")
+
+    for punkt in huelle:
+        print(formatiere_punkt(punkt))
+
+
+# main wird nur beim direkten Start dieser Datei ausgeführt.
+# Beim Import, zum Beispiel in den Tests, bleibt es unangetastet.
+if __name__ == "__main__":
+    main()</code></pre>
+  </section>
+
+  <section class="answers" id="antworten" aria-labelledby="answers-title">
+    <header class="answers-head">
+      <p class="eyebrow">ANTWORTEN ZUR AUFGABENSTELLUNG</p>
+      <h2 id="answers-title">Datenstrukturen und Elementar-Operationen.</h2>
+      <p>Die beiden Fragen aus der Projektaufgabe, kurz beantwortet.</p>
+    </header>
+
+    <div class="answer-block">
+      <h3><span>1</span>Welche Datenstrukturen benötigen Sie?</h3>
+      <table class="answer-table">
+        <thead><tr><th>Datenstruktur</th><th>Im Code</th><th>Wofür</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Punkt</strong> (Record mit zwei Zahlen)</td>
+            <td><code>@dataclass(frozen=True) class Punkt</code></td>
+            <td>Speichert genau eine x- und eine y-Koordinate. Unveränderlich, damit kein Punkt versehentlich verschoben wird.</td>
+          </tr>
+          <tr>
+            <td><strong>Liste / Array</strong> der Eingabepunkte</td>
+            <td><code>punkte: list[Punkt]</code>, <code>sortiert</code></td>
+            <td>Hält die bis zu 100 Eingabepunkte. Nach dem Sortieren liegen sie von links nach rechts vor.</td>
+          </tr>
+          <tr>
+            <td><strong>Stack</strong> (dynamische Liste) für jede Hüllenhälfte</td>
+            <td><code>kette</code> → <code>oben</code>, <code>unten</code></td>
+            <td>Nimmt die Randkette auf. Neue Punkte kommen oben drauf, geprüft werden nur die obersten drei, entfernt wird nur der vorletzte. Alle drei Zugriffe kosten <code>O(1)</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>Ergebnisliste</strong></td>
+            <td><code>huelle = oben + unten[1:-1]</code></td>
+            <td>Die Teilmenge von M, die die konvexe Hülle bildet, im Uhrzeigersinn.</td>
+          </tr>
+          <tr>
+            <td><strong>Menge</strong> (Hilfsstruktur zur Prüfung)</td>
+            <td><code>x_werte: set[float]</code></td>
+            <td>Prüft in <code>O(n)</code>, ob alle x-Koordinaten verschieden sind.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="answer-block">
+      <h3><span>2</span>Welche Funktionen für Elementar-Operationen benötigen Sie?</h3>
+      <table class="answer-table">
+        <thead><tr><th>Operation</th><th>Im Code</th><th>Aufwand</th><th>Wofür</th></tr></thead>
+        <tbody>
+          <tr class="key-row">
+            <td><strong>Orientierungstest</strong> (Determinante)</td>
+            <td><code>orientierung(p, q, r)</code></td>
+            <td><code>O(1)</code></td>
+            <td>
+              <code>D = (qₓ−pₓ)(rᵧ−pᵧ) − (qᵧ−pᵧ)(rₓ−pₓ)</code><br>
+              <code>D &lt; 0</code> Rechtskurve, <code>D &gt; 0</code> Linkskurve, <code>D = 0</code> kollinear.
+              Damit lässt sich prüfen, auf welcher Seite der Geraden pr der Punkt q liegt (Tipp der Aufgabe).
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Sortieren nach x</strong></td>
+            <td><code>sorted(punkte, key=lambda p: p.x)</code></td>
+            <td><code>O(n log n)</code></td>
+            <td>Legt die Reihenfolge „von links nach rechts“ fest. Rückwärts gelesen (<code>reversed</code>) ergibt sich „von rechts nach links“ für die untere Hülle.</td>
+          </tr>
+          <tr>
+            <td><strong>Push</strong> (Punkt anhängen)</td>
+            <td><code>kette.append(punkt)</code></td>
+            <td><code>O(1)</code></td>
+            <td>Der nächste Punkt kommt probeweise ans Ende der Randkette.</td>
+          </tr>
+          <tr>
+            <td><strong>Zugriff auf die letzten drei Punkte</strong></td>
+            <td><code>p, q, r = kette[-3:]</code></td>
+            <td><code>O(1)</code></td>
+            <td>Liefert die drei Punkte für den Orientierungstest.</td>
+          </tr>
+          <tr>
+            <td><strong>Mittleren Punkt entfernen</strong></td>
+            <td><code>del kette[-2]</code></td>
+            <td><code>O(1)</code></td>
+            <td>Entfernt q bei Links- oder Geradeauskurve. Danach wird erneut getestet (<code>while</code>).</td>
+          </tr>
+          <tr>
+            <td><strong>Randkette aufbauen</strong></td>
+            <td><code>_rechte_randkette(punkte)</code></td>
+            <td><code>O(n)</code></td>
+            <td>Baut eine Hälfte aus Push, Test und Entfernen. Jeder Punkt wird höchstens einmal eingefügt und einmal entfernt.</td>
+          </tr>
+          <tr>
+            <td><strong>Hälften verbinden</strong></td>
+            <td><code>oben + unten[1:-1]</code></td>
+            <td><code>O(n)</code></td>
+            <td>Linkester und rechtester Punkt kommen in beiden Hälften vor und werden nur einmal übernommen.</td>
+          </tr>
+          <tr>
+            <td><strong>Eingabe prüfen</strong></td>
+            <td><code>validiere_punkte(punkte)</code></td>
+            <td><code>O(n)</code></td>
+            <td>Höchstens 100 Punkte, paarweise verschiedene x-Koordinaten.</td>
+          </tr>
+          <tr>
+            <td><strong>Einlesen / Ausgeben</strong></td>
+            <td><code>lies_punkte()</code>, <code>formatiere_punkt()</code></td>
+            <td><code>O(n)</code></td>
+            <td>Textdatei in Punkt-Objekte umwandeln und das Ergebnis als <code>(x, y)</code> ausgeben.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="answer-summary">
+        <strong>Gesamt:</strong> Sortieren <code>O(n log n)</code> + beide Hälften <code>O(n)</code>
+        = <strong><code>O(n log n)</code> Laufzeit</strong>, <strong><code>O(n)</code> zusätzlicher Speicher</strong>.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <p>Konvexe Hülle · Inkrementeller Algorithmus · Python</p>
+    <a href="../konvexe_huelle.py">Kommentierte Python-Datei öffnen</a>
+  </footer>
+
+  <script src="app.js"></script>
+  <script src="playground.js"></script>
+</body>
+</html>
