@@ -126,35 +126,44 @@
         <li class="cs-step cs-blue">
           <span class="cs-num">1</span>
           <code class="cs-fn">lies_punkte()</code>
-          <span class="cs-desc">Datei einlesen → Liste von Punkten</span>
+          <span class="cs-desc">Datei einlesen</span>
           <ul class="cs-sub">
             <li><code>validiere_punkte()</code><span>Eingabe prüfen</span></li>
           </ul>
+          <p class="cs-data"><span>liefert</span><code>punkte: list[Punkt]</code></p>
         </li>
         <li class="cs-step cs-green cs-key">
           <span class="cs-num">2</span>
-          <code class="cs-fn">konvexe_huelle()</code>
+          <code class="cs-fn">konvexe_huelle(punkte)</code>
           <span class="cs-desc">der eigentliche Algorithmus</span>
           <ul class="cs-sub">
-            <li><code>validiere_punkte()</code><span>Eingabe prüfen</span></li>
-            <li><code>sorted()</code><span>nach x sortieren</span></li>
-            <li><code>_rechte_randkette()</code><span>obere, dann untere Hälfte</span>
+            <li><code>validiere_punkte()</code><span>noch einmal prüfen – die Funktion kann auch direkt aufgerufen werden, z.&nbsp;B. in den Tests</span></li>
+            <li><code>sorted()</code><span>→ <code>sortiert: list[Punkt]</code></span></li>
+            <li><code>_rechte_randkette()</code> <em>2×</em><span>Stack <code>kette</code> → <code>oben</code>, <code>unten</code></span>
               <ul class="cs-sub">
                 <li><code>orientierung()</code><span>Kurve erkennen</span></li>
               </ul>
             </li>
           </ul>
+          <p class="cs-data"><span>liefert</span><code>huelle: list[Punkt]</code></p>
         </li>
         <li class="cs-step cs-yellow">
           <span class="cs-num">3</span>
           <code class="cs-fn">formatiere_punkt()</code>
-          <span class="cs-desc">jeden Hüllenpunkt als <code>(x, y)</code> ausgeben</span>
+          <span class="cs-desc">für jeden Punkt der Hülle</span>
+          <p class="cs-data"><span>liefert</span><code>"(x, y)"</code> als Text für <code>print()</code></p>
         </li>
       </ol>
 
-      <div class="cs-type">
-        <span class="cs-dot blue-icon" aria-hidden="true">●</span>
-        <p><strong>Klasse <code>Punkt</code></strong> speichert x + y – alle Funktionen arbeiten mit diesem Datentyp.</p>
+      <div class="cs-ds">
+        <p class="cs-ds-title">Datenstrukturen</p>
+        <ul class="cs-ds-list">
+          <li class="cs-blue"><code>Punkt</code><strong>Klasse</strong><span>speichert genau x und y, unveränderlich</span></li>
+          <li class="cs-blue"><code>punkte</code>, <code>sortiert</code><strong>list[Punkt]</strong><span>alle Eingabepunkte, dann nach x sortiert</span></li>
+          <li class="cs-green"><code>kette</code> → <code>oben</code>, <code>unten</code><strong>list[Punkt] als Stack</strong><span>anhängen, letzte drei prüfen, vorletzten löschen</span></li>
+          <li class="cs-green"><code>huelle</code><strong>list[Punkt]</strong><span>Ergebnis im Uhrzeigersinn</span></li>
+          <li class="cs-yellow"><code>x_werte</code><strong>set[float]</strong><span>in <code>validiere_punkte()</code>: doppelte x finden</span></li>
+        </ul>
       </div>
     </div>
 
@@ -445,6 +454,11 @@
       <span><strong># Kommentar</strong> = Erklärung eines Schrittes</span>
     </div>
 
+    <details class="complete-code-details">
+      <summary>
+        <span class="cc-open">Code anzeigen</span><span class="cc-close">Code ausblenden</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </summary>
     <pre class="complete-code-window"><code id="complete-code-block">"""Berechnet die konvexe Hülle einer Punktmenge.
 
 Die konvexe Hülle ist der kleinste Rand, der alle Punkte einschließt.
@@ -663,6 +677,7 @@ def main() -&gt; None:
 # Beim Import, zum Beispiel in den Tests, bleibt es unangetastet.
 if __name__ == "__main__":
     main()</code></pre>
+    </details>
   </section>
 
   <section class="answers" id="antworten" aria-labelledby="answers-title">

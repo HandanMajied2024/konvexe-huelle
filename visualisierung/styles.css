@@ -650,11 +650,6 @@ footer a { color: var(--ink); }
 .cs-sub li::after { content: ""; position: absolute; left: 4px; top: 1.15em; width: 12px; border-top: 2px solid var(--line); }
 .cs-sub code { padding: 0; background: transparent; font-size: 15px; font-weight: 700; overflow-wrap: anywhere; }
 .cs-sub span { display: block; color: var(--muted); font-size: 14px; line-height: 1.3; }
-.cs-type { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border: 1px solid var(--line); border-left: 6px solid var(--blue); background: white; }
-.cs-type p { margin: 0; color: var(--muted); font-size: 16px; }
-.cs-type strong { color: var(--ink); }
-.cs-type code { padding: 0; background: transparent; }
-.cs-dot { flex: none; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 5px; font-size: 12px; }
 @media (max-width: 900px) {
   .cs-steps { grid-template-columns: 1fr; }
 }
@@ -664,3 +659,37 @@ footer a { color: var(--ink); }
   .cs-stage { padding: 14px 16px; }
   .cs-stage strong { font-size: 19px; }
 }
+
+.cs-step { display: flex; flex-direction: column; }
+.cs-sub em { color: var(--green); font-style: normal; font-weight: 700; font-size: 13px; }
+.cs-sub span code { font-size: 13px; font-weight: 600; color: var(--ink); }
+.cs-data { margin: auto 0 0; padding-top: 14px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; color: var(--muted); font-size: 14px; }
+.cs-data > span { padding: 2px 7px; border-radius: 3px; background: var(--faint); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.cs-data code { padding: 0; background: transparent; color: var(--ink); font-size: 14px; font-weight: 700; }
+.cs-ds { padding: 18px 20px; border: 2px solid var(--ink); background: white; }
+.cs-ds-title { margin: 0 0 12px; font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.cs-ds-list { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.cs-ds-list li { min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-top: 4px solid var(--blue); background: white; }
+.cs-ds-list li.cs-green { border-top-color: var(--green); }
+.cs-ds-list li.cs-yellow { border-top-color: var(--yellow); }
+.cs-ds-list code { padding: 0; background: transparent; font-size: 15px; font-weight: 700; overflow-wrap: anywhere; }
+.cs-ds-list strong { display: block; margin-top: 4px; color: var(--ink); font: 600 13px "SFMono-Regular", Menlo, monospace; }
+.cs-ds-list span { display: block; margin-top: 4px; color: var(--muted); font-size: 14px; line-height: 1.35; }
+.cs-ds-list span code { font-size: 13px; }
+@media (max-width: 1100px) { .cs-ds-list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .cs-ds-list { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .cs-ds-list { grid-template-columns: 1fr; } }
+
+/* ---------- Ganzer Code: auf- und zuklappbar ---------- */
+.complete-code-details > summary {
+  display: inline-flex; align-items: center; gap: 10px; margin-bottom: 16px;
+  min-height: 46px; padding: 10px 18px; border: 1px solid var(--ink); border-radius: 6px;
+  background: var(--ink); color: white; font-weight: 600; cursor: pointer; list-style: none; user-select: none;
+}
+.complete-code-details > summary::-webkit-details-marker { display: none; }
+.complete-code-details > summary:hover { background: white; color: var(--ink); }
+.complete-code-details > summary:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+.complete-code-details > summary svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; transition: transform .25s var(--ease); }
+.complete-code-details[open] > summary svg { transform: rotate(180deg); }
+.complete-code-details .cc-close, .complete-code-details[open] .cc-open { display: none; }
+.complete-code-details[open] .cc-close { display: inline; }
